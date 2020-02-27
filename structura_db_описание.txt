@@ -1,0 +1,100 @@
+База данных db_tests содержит таблицы:
+- persons, 		хранятся данные на тестируемого;
+
+- persons_answers, 	таблица содержит данные по номеру теста, 
+			полноте ответов на вопросы теста, 
+			ссылку на страницу сайта ответов, 
+			ссылку на таблицу содержащую непосредственно ответы тестируемого;
+
+- persons_corpus	хранятся ответы тестируемого в виде блока текста;
+
+- tests			хранятся данные о тестах;
+			ссылка на таблицу содержащую непосредственно вопросы теста в формате test_Y, где Y номер теста.
+
+- test_Y		таблица вопросов теста с номером Y
+
+- table_answer_XXXXXX_Y	таблица тестируемого с кодом регистрации XXXXXX на сайте с ответами на вопросы теста с номером Y
+
+
+
+
+-- Таблица: persons
+CREATE TABLE persons (
+    name_person TEXT        NOT NULL,
+    code_person INTEGER     PRIMARY KEY
+                            NOT NULL,
+    pol         STRING (15),
+    date_reg    DATE        NOT NULL,
+    vozrast     INT,
+    znak_zodiak STRING (8) 
+);
+
+-- поле name_person содержит имя пользователя (тестируемого) указанное при регистрации на сайте
+-- поле code_person содержит код регистрации пользователя (тестируемого) на сайте
+-- поле pol содержит пол пользователя (тестируемого) указанного при регистрации
+-- поле date_reg  содежит дату регистрации на сайте пользователя (тестируемого)
+-- поле vozrast  содержит возраст в годах, указываемое пользователем (тестируемым) при регистрации
+-- поле znak_zodiak  содержит значение знака зодиака, указываемое пользователем (тестируемым) при регистрации
+
+
+-- Таблица: persons_answers
+CREATE TABLE persons_answers (
+    code_person        INTEGER REFERENCES persons (code_person) 
+                               NOT NULL,
+    n_test             INTEGER REFERENCES tests (n_test)
+                               NOT NULL,
+    full_answer        BOOLEAN DEFAULT True
+                               NOT NULL,
+    name_table_answers TEXT    NOT NULL,
+    link               TEXT    NOT NULL
+);
+
+
+-- поле code_person содержит код регистрации пользователя (тестируемого) на сайте
+-- поле n_test  номер теста
+-- поле full_answer  определяет полноту ответов пользователя (тестируемого): True - есть ответы на все вопросы, False - не на все вопросы есть ответы
+-- поле name_table_answers  содежит имя таблицы ответов тестируемого
+-- поле link  содержит ссылку на страницу сайта с ответами пользователя (тестируемого)
+
+-- Таблица: persons_corpus
+CREATE TABLE persons_corpus (
+    code_person INTEGER NOT NULL
+                        REFERENCES persons (code_person),
+    n_test      INTEGER NOT NULL,
+    corpus      TEXT
+);
+
+-- поле code_person содержит код регистрации пользователя (тестируемого) на сайте
+-- поле n_test  номер теста
+-- поле corpus содержит корпус ответа тестируемого
+
+
+-- Таблица: tests
+CREATE TABLE tests (
+    n_test          INTEGER PRIMARY KEY
+                            NOT NULL,
+    name_test       TEXT    NOT NULL
+                            UNIQUE,
+    name_table_test TEXT    NOT NULL
+);
+
+-- поле n_test  номер теста
+-- поле name_test содержит наименование теста
+-- поле name_table_test содержит наименование таблицы содержащего вопросы теста
+
+
+-- Таблица: test_Y
+CREATE TABLE test_Y (n_stroka INTEGER, vopros TEXT);
+
+-- поле n_stroka порядковый номер записи в таблице
+-- поле vopros содержит вопросы теста № Y
+
+
+-- Таблица: table_answer_XXXXXX_Y
+CREATE TABLE table_answer_XXXXXX_Y (n_stroka INTEGER, answer TEXT);
+
+-- поле n_stroka порядковый номер записи в таблице
+-- поле answer содержит ответы на вопрос теста пользователем (тестируемым) 
+
+table_answer_XXXXXX_Y XXXXXX = code_person, содержит код регистрации пользователя (тестируемого) на сайте
+-- Y = n_test, номер теста 
